@@ -299,6 +299,7 @@ function formatLowFaresSearch(searchRequest, searchResult) {
   const segments = searchResult['air:AirSegmentList'];
   const flightDetails = searchResult['air:FlightDetailsList'];
   const { provider } = searchRequest;
+  const hostTokens = searchResult['air:HostTokenList']['common_v52_0:HostToken'] ?? [];
 
   // const legs = _.first(_.toArray(searchResult['air:RouteList']))['air:Leg'];
 
@@ -313,7 +314,7 @@ function formatLowFaresSearch(searchRequest, searchResult) {
   Object.entries(results).forEach(([fareKey, price]) => {
     const [firstKey] = Object.keys(price['air:AirPricingInfo']);
     const thisFare = price['air:AirPricingInfo'][firstKey]; // get trips from first reservation
-    if (provider !== 'ACH' && !thisFare.PlatingCarrier) {
+    if (thisFare.ProviderCode !== 'ACH' && !thisFare.PlatingCarrier) {
       return;
     }
 
@@ -379,6 +380,8 @@ function formatLowFaresSearch(searchRequest, searchResult) {
                 bookingClass: segmentInfo.BookingCode,
                 baggage: [getBaggage(fareInfo['air:BaggageAllowance'])],
                 fareBasisCode: fareInfo.FareBasis,
+                hostTokenRef: segmentInfo.HostTokenRef,
+                hostToken: hostTokens[segmentInfo.HostTokenRef]?.['_'] ?? null,
               },
               seatsAvailable ? { seatsAvailable } : null
             );

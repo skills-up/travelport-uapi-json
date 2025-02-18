@@ -6,7 +6,7 @@ module.exports = `
     <soap:Header/>
     <soap:Body>
         <air:AirPriceReq
-            AuthorizedBy="user" CheckFlightDetails="true" TargetBranch="{{TargetBranch}}"
+            AuthorizedBy="user" TargetBranch="{{TargetBranch}}"
             TraceId="{{requestId}}"
             {{#if fetchFareRules}}
             FareRuleType="{{#if long}}long{{else}}short{{/if}}"
@@ -30,24 +30,32 @@ module.exports = `
                                 PolledAvailabilityOption="Polled avail exists"
                                 ProviderCode="{{../provider}}"
                                 Key="{{@index}}"
+                                {{#if hostToken}}
+                                HostTokenRef="{{hostTokenRef}}"
+                                {{/if}}
                                 Group="{{group}}">
                     {{#if transfer}}
                     <air:Connection/>
                     {{/if}}
                 </air:AirSegment>
                 {{/segments}}
+                {{#segments}}
+                {{#if hostToken}}
+                <com:HostToken Key="{{hostTokenRef}}">{{hostToken}}</com:HostToken>
+                {{/if}}
+                {{/segments}}
             </air:AirItinerary>
             {{#if platingCarrier}}
               <air:AirPricingModifiers PlatingCarrier="{{platingCarrier}}"/>
             {{/if}}
             {{#if business}}
-            <air:AirPricingModifiers InventoryRequestType="DirectAccess">
+            <air:AirPricingModifiers>
                 <air:PermittedCabins>
                     <com:CabinClass Type="Business" xmlns:com="http://www.travelport.com/schema/common_v52_0" />
                 </air:PermittedCabins>
             </air:AirPricingModifiers>
             {{else}}
-            <air:AirPricingModifiers InventoryRequestType="DirectAccess"/>
+            <air:AirPricingModifiers/>
             {{/if}}
             {{#passengers}}
             <com:SearchPassenger Key="P_{{@index}}" Code="{{ageCategory}}" {{#if child}}Age="9"{{else if Age}}Age="{{Age}}"{{/if}} xmlns:com="http://www.travelport.com/schema/common_v52_0"/>

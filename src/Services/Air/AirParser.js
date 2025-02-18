@@ -230,10 +230,26 @@ function airPrice(obj) {
 
   const pricingInfoKeys = Object.keys(pricingSolution['air:AirPricingInfo']);
   const thisFare = pricingSolution['air:AirPricingInfo'][pricingInfoKeys[0]]; // first get pricing info
-  if (!thisFare.PlatingCarrier) {
+  if (thisFare.ProviderCode !== 'ACH' && !thisFare.PlatingCarrier) {
     throw new AirParsingError.PlatingCarrierNotSet();
   }
 
+  const optionalServices = {};
+  Object.values(pricingSolution['air:OptionalServices'] ?? {}).filter(service => service.Type !== 'PreReservedSeatAssignment').forEach(service => {
+    const segRef = service['common_v52_0:ServiceData']['AirSegmentRef'];
+    if (optionalServices[segRef] === undefined) {
+      optionalServices[segRef] = {};
+    }
+    optionalServices[segRef][service.ProviderDefinedType] = {
+      Type: service.Type,
+      TotalPrice: service.TotalPrice,
+      ServiceStatus: service.ServiceStatus,
+      Key: service.Key,
+      DisplayText: service.DisplayText,
+      Quantity: service.Quantity,
+    };
+  });
+  
   const airSegments = obj['air:AirItinerary']['air:AirSegment'];
   const segments = Object.keys(airSegments).map((segKey) => {
     return obj['air:AirItinerary']['air:AirSegment'][segKey];
@@ -255,15 +271,33 @@ function airPrice(obj) {
     });
 
     const trips = segs.map((segment) => {
-      const tripFlightDetails = Object.keys(segment['air:FlightDetails'])
-        .map((flightDetailsRef) => segment['air:FlightDetails'][flightDetailsRef]);
+      let tripFlightDetails, baggage, includedServices, chargeableServices, servicesMenu;
 
       const [bookingInfo] = thisFare['air:BookingInfo'].filter((info) => info.SegmentRef === segment.Key);
       const fareInfo = thisFare['air:FareInfo'][bookingInfo.FareInfoRef];
 
-      const baggage = format.getBaggageInfo(thisFare['air:BaggageAllowances']['air:BaggageAllowanceInfo'][leg]);
-      baggageInfos.push(baggage);
-
+      if (thisFare.ProviderCode !== 'ACH') {
+        tripFlightDetails = Object.keys(segment['air:FlightDetails'])
+          .map((flightDetailsRef) => segment['air:FlightDetails'][flightDetailsRef]);
+      
+        baggage = format.getBaggageInfo(thisFare['air:BaggageAllowances']['air:BaggageAllowanceInfo'][leg]);
+        baggageInfos.push(baggage);
+      } else {
+        const segmentServices = Object.values(fareInfo['air:Brand'])[0]['air:OptionalServices'];
+        const simplifiedServices = Object.values(segmentServices).map((service) => ({
+          Key: service.Key,
+          Type: service.Type,
+          Tag: service.Tag,
+          DisplayOrder: service.DisplayOrder,
+          Chargeable: service.Chargeable,
+          DisplayText: service['air:Title']?.filter(title => title.Type === 'External')[0]['_'],
+          Description: service['air:Text']?.filter(text => text.Type === 'MarketingAgent')[0]['_'],
+        }));
+        includedServices = simplifiedServices.filter(service => service.Chargeable === 'Included in the brand');
+        chargeableServices = simplifiedServices.filter(service => service.Chargeable === 'Available for a charge');
+        servicesMenu = optionalServices[segment.Key];
+      }
+      
       return Object.assign(
         format.formatTrip(segment, tripFlightDetails),
         {
@@ -271,6 +305,9 @@ function airPrice(obj) {
           bookingClass: bookingInfo.BookingCode,
           fareBasisCode: fareInfo.FareBasis,
           baggage,
+          includedServices,
+          chargeableServices,
+          servicesMenu,
         }
       );
     });
