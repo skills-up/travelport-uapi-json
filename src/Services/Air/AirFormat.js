@@ -381,7 +381,7 @@ function formatLowFaresSearch(searchRequest, searchResult) {
                 bookingClass: segmentInfo.BookingCode,
                 baggage: [getBaggage(fareInfo['air:BaggageAllowance'])],
                 fareBasisCode: fareInfo.FareBasis,
-                hostToken: hostTokens[segmentInfo.HostTokenRef],
+                hostToken: hostTokens[segmentInfo.HostTokenRef]?._,
                 apisRequirements: apisRequirementsList[segment.APISRequirementsRef],
               },
               seatsAvailable ? { seatsAvailable } : null

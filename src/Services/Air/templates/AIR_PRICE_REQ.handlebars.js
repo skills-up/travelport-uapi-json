@@ -31,7 +31,7 @@ module.exports = `
                                 ProviderCode="{{../provider}}"
                                 Key="{{@index}}"
                                 {{#if hostToken}}
-                                HostTokenRef="{{hostToken/Key}}"
+                                HostTokenRef="HT_{{@index}}"
                                 {{/if}}
                                 Group="{{group}}">
                     {{#if transfer}}
@@ -41,7 +41,7 @@ module.exports = `
                 {{/segments}}
                 {{#segments}}
                 {{#if hostToken}}
-                <com:HostToken Key="{{hostToken/Key}}">{{hostToken/_}}</com:HostToken>
+                <com:HostToken Key="HT_{{@index}}">{{hostToken}}</com:HostToken>
                 {{/if}}
                 {{/segments}}
             </air:AirItinerary>
