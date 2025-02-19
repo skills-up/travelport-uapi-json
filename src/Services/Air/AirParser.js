@@ -290,8 +290,8 @@ function airPrice(obj) {
           Tag: service.Tag,
           DisplayOrder: service.DisplayOrder,
           Chargeable: service.Chargeable,
-          DisplayText: service['air:Title']?.filter(title => title.Type === 'External')[0]['_'],
-          Description: service['air:Text']?.filter(text => text.Type === 'MarketingAgent')[0]['_'],
+          DisplayText: format.toArray(service['air:Title'])?.filter(title => title.Type === 'External')[0]?.['_'],
+          Description: format.toArray(service['air:Text'])?.filter(text => text.Type === 'MarketingAgent')[0]?.['_'],
         }));
         includedServices = simplifiedServices.filter(service => service.Chargeable === 'Included in the brand');
         chargeableServices = simplifiedServices.filter(service => service.Chargeable === 'Available for a charge');

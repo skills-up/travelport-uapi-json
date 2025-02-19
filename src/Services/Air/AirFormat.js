@@ -300,6 +300,7 @@ function formatLowFaresSearch(searchRequest, searchResult) {
   const flightDetails = searchResult['air:FlightDetailsList'];
   const { provider } = searchRequest;
   const hostTokens = searchResult['air:HostTokenList']['common_v52_0:HostToken'] ?? [];
+  const apisRequirementsList = searchResult['air:APISRequirementsList'];
 
   // const legs = _.first(_.toArray(searchResult['air:RouteList']))['air:Leg'];
 
@@ -380,8 +381,8 @@ function formatLowFaresSearch(searchRequest, searchResult) {
                 bookingClass: segmentInfo.BookingCode,
                 baggage: [getBaggage(fareInfo['air:BaggageAllowance'])],
                 fareBasisCode: fareInfo.FareBasis,
-                hostTokenRef: segmentInfo.HostTokenRef,
-                hostToken: hostTokens[segmentInfo.HostTokenRef]?.['_'] ?? null,
+                hostToken: hostTokens[segmentInfo.HostTokenRef],
+                apisRequirements: apisRequirementsList[segment.APISRequirementsRef],
               },
               seatsAvailable ? { seatsAvailable } : null
             );
@@ -562,6 +563,20 @@ function setReferencesForSegments(segments) {
   });
 }
 
+/**
+ * Converts given value to array.
+ * If value is already an array, returns it as is.
+ * If value is null or undefined, returns it as is if nullable flag is true,
+ * otherwise returns empty array.
+ * If value is not an array, wraps it in an array.
+ * @param {*} params
+ * @param {boolean} [nullable=true]
+ * @return {Array}
+ */
+function toArray(params, nullable = true) {
+  return params ? (Array.isArray(params) ? params : [params]) : (nullable ? params : []);
+}
+
 module.exports = {
   formatLowFaresSearch,
   formatFarePricingInfo,
@@ -575,5 +590,6 @@ module.exports = {
   getBaggage,
   getBaggageInfo,
   buildPassenger,
+  toArray,
   setReferencesForSegments
 };

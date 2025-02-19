@@ -32,6 +32,7 @@ module.exports = `
                     <com:CityOrAirport Code="{{to}}" PreferCity="true"/>
                 </air:SearchDestination>
                 <air:SearchDepTime PreferredTime="{{departureDate}}"/>
+                {{#equal ../provider "1G"}}
                 <air:AirLegModifiers>
                     {{#*inline "connectionPoint"}}
                       <com:ConnectionPoint>
@@ -71,6 +72,7 @@ module.exports = `
                     </air:PreferredCabins>
                     {{/if}}
                 </air:AirLegModifiers>
+                {{/equal}}
             </air:SearchAirLeg>
             {{/legs}}
             <air:AirSearchModifiers
