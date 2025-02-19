@@ -242,7 +242,7 @@ function airPrice(obj) {
     }
     optionalServices[segRef][service.ProviderDefinedType] = {
       Type: service.Type,
-      TotalPrice: service.TotalPrice,
+      TotalPrice: service.ApproximateTotalPrice ?? service.TotalPrice,
       ServiceStatus: service.ServiceStatus,
       Key: service.Key,
       DisplayText: service.DisplayText,
@@ -351,16 +351,18 @@ function airPrice(obj) {
     farePricingMethod: thisFare.PricingMethod,
     farePricingType: thisFare.PricingType,
     platingCarrier: thisFare.PlatingCarrier,
-    totalPrice: pricingSolution.TotalPrice,
-    basePrice: pricingSolution.BasePrice,
-    equivalentBasePrice: pricingSolution.EquivalentBasePrice,
-    taxes: pricingSolution.Taxes,
+    totalPrice: pricingSolution.ApproximateTotalPrice ?? pricingSolution.TotalPrice,
+    basePrice: pricingSolution.ApproximateBasePrice ?? pricingSolution.BasePrice,
+    // equivalentBasePrice: pricingSolution.EquivalentBasePrice,
+    taxes: pricingSolution.ApproximateTaxes ?? pricingSolution.Taxes,
+    fees: pricingSolution.ApproximateFees ?? pricingSolution.Fees,
     directions,
     bookingComponents: [
       {
-        totalPrice: thisFare.TotalPrice,
-        basePrice: thisFare.BasePrice,
-        taxes: thisFare.Taxes,
+        totalPrice: thisFare.ApproximateTotalPrice ?? thisFare.TotalPrice,
+        basePrice: thisFare.ApproximateBasePrice ?? thisFare.BasePrice,
+        taxes: thisFare.ApproximateTaxes ?? thisFare.Taxes,
+        fees: thisFare.ApproximateFees ?? thisFare.Fees,
         uapi_fare_reference: thisFare.Key,
       },
     ],
@@ -371,6 +373,10 @@ function airPrice(obj) {
     baggage: baggageInfos,
     timeToReprice: thisFare.LatestTicketingTime,
   };
+}
+
+function seatMap(obj) {
+  return obj;
 }
 
 function airPriceRspPricingSolutionXML(obj) {
@@ -755,10 +761,10 @@ function getTicketFromEtr(etr, obj, allowNoProviderLocatorCodeRetrieval = false)
       : null),
     ...(priceInfoAvailable
       ? {
-        totalPrice: priceSource.TotalPrice
-        || `${(priceSource.EquivalentBasePrice || priceSource.BasePrice).slice(0, 3)}0`,
-        basePrice: priceSource.BasePrice,
-        equivalentBasePrice: priceSource.EquivalentBasePrice,
+        totalPrice: priceSource.ApproxiamteTotalPrice || priceSource.TotalPrice 
+        || `${(/* priceSource.EquivalentBasePrice || */ priceSource.ApproxiamteBasePrice || priceSource.BasePrice).slice(0, 3)}0`,
+        basePrice: priceSource.ApproxiamteBasePrice ?? priceSource.BasePrice,
+        // equivalentBasePrice: priceSource.EquivalentBasePrice,
       }
       : null),
     ...(exchangedTickets.length > 0
@@ -1161,10 +1167,11 @@ function extractBookings(obj) {
             uapi_pricing_info_group: pricingInfo.AirPricingInfoGroup,
             farePricingMethod: pricingInfo.PricingMethod,
             farePricingType: pricingInfo.PricingType,
-            totalPrice: pricingInfo.TotalPrice,
-            basePrice: pricingInfo.BasePrice,
-            equivalentBasePrice: pricingInfo.EquivalentBasePrice,
-            taxes: pricingInfo.Taxes,
+            totalPrice: pricingInfo.ApproximateTotalPrice ?? pricingInfo.TotalPrice,
+            basePrice: pricingInfo.ApproximateBasePrice ?? pricingInfo.BasePrice,
+            // equivalentBasePrice: pricingInfo.EquivalentBasePrice,
+            taxes: pricingInfo.ApproximateTaxes ?? pricingInfo.Taxes,
+            fees: pricingInfo.ApproximateFees ?? pricingInfo.Fees,
             passengersCount,
             taxesInfo,
             baggage,
@@ -1569,6 +1576,7 @@ function getEMDItem(obj) {
 module.exports = {
   AIR_LOW_FARE_SEARCH_REQUEST: lowFaresSearchRequest,
   AIR_PRICE_REQUEST: airPrice,
+  SEAT_MAP_REQUEST: seatMap,
   AIR_PRICE_REQUEST_PRICING_SOLUTION_XML: airPriceRspPricingSolutionXML,
   AIR_PRICE_FARE_RULES_REQUEST: airPriceFareRules,
   AIR_CREATE_RESERVATION_REQUEST: extractBookings,

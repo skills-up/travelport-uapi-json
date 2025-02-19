@@ -50,10 +50,8 @@ function getBaggageInfo(info) {
     baggageInfo.detail = info['air:BagDetails'].map((detail) => {
       return {
         applicableBags: detail.ApplicableBags,
-        basePrice: detail.BasePrice,
-        totalPrice: detail.TotalPrice,
-        approximateBasePrice: detail.ApproximateBasePrice,
-        approximateTotalPrice: detail.ApproximateTotalPrice,
+        basePrice: detail.ApproximateBasePrice ?? detail.BasePrice,
+        totalPrice: detail.ApproximateTotalPrice ?? detail.TotalPrice,
         restrictionText: detail['air:BaggageRestriction']['air:TextInfo'],
       };
     });
@@ -132,10 +130,11 @@ function formatServiceSegment(segment, remark) {
 
 function formatPrices(prices) {
   return {
-    basePrice: prices.BasePrice,
-    taxes: prices.Taxes,
-    equivalentBasePrice: prices.EquivalentBasePrice,
-    totalPrice: prices.TotalPrice,
+    basePrice: prices.ApproximateBasePrice ?? prices.BasePrice,
+    taxes: prices.ApproximateTaxes ?? prices.Taxes,
+    fees: prices.ApproximateFees ?? prices.Fees,
+    // equivalentBasePrice: prices.EquivalentBasePrice,
+    totalPrice: prices.ApproximateTotalPrice ?? prices.TotalPrice,
   };
 }
 
@@ -214,10 +213,11 @@ function formatPassengerCategories(pricingInfo) {
   const passengerFares = Object.keys(passengerCategories)
     .reduce((memo, ptc) => Object.assign(memo, {
       [ptc]: {
-        totalPrice: passengerCategories[ptc].TotalPrice,
-        basePrice: passengerCategories[ptc].BasePrice,
-        equivalentBasePrice: passengerCategories[ptc].EquivalentBasePrice,
-        taxes: passengerCategories[ptc].Taxes,
+        totalPrice: passengerCategories[ptc].ApproximateTotalPrice ?? passengerCategories[ptc].TotalPrice,
+        basePrice: passengerCategories[ptc].ApproximateBasePrice ?? passengerCategories[ptc].BasePrice,
+        // equivalentBasePrice: passengerCategories[ptc].EquivalentBasePrice,
+        taxes: passengerCategories[ptc].ApproximateTaxes ?? passengerCategories[ptc].Taxes,
+        fees: passengerCategories[ptc].ApproximateFees ?? passengerCategories[ptc].Fees,
         fareCalc: passengerCategories[ptc].FareCalc,
       },
     }), {});
@@ -403,16 +403,18 @@ function formatLowFaresSearch(searchRequest, searchResult) {
     const { passengerCounts, passengerFares } = this.formatPassengerCategories(price['air:AirPricingInfo']);
 
     const result = {
-      totalPrice: price.TotalPrice,
-      basePrice: price.BasePrice,
-      taxes: price.Taxes,
+      totalPrice: price.ApproxiamteTotalPrice ?? price.TotalPrice,
+      basePrice: price.ApproxiamteBasePrice ?? price.BasePrice,
+      taxes: price.ApproxiamteTaxes ?? price.Taxes,
+      fees: price.ApproxiamteFees ?? price.Fees,
       platingCarrier: thisFare.PlatingCarrier,
       directions,
       bookingComponents: [
         {
-          totalPrice: price.TotalPrice,
-          basePrice: price.BasePrice,
-          taxes: price.Taxes,
+          totalPrice: price.ApproxiamteTotalPrice ?? price.TotalPrice,
+          basePrice: price.ApproxiamteBasePrice ?? price.BasePrice,
+          taxes: price.ApproxiamteTaxes ?? price.Taxes,
+          fees: price.ApproxiamteFees ?? price.Fees,
           uapi_fare_reference: fareKey, // TODO
         },
       ],
