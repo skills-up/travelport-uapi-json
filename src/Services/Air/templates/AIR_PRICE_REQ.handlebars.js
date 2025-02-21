@@ -5,35 +5,11 @@ module.exports = `
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Header/>
     <soap:Body>
-        <air:AirPriceReq
-            AuthorizedBy="user" TargetBranch="{{TargetBranch}}"
-            TraceId="{{requestId}}"
-            {{#if fetchFareRules}}
-            FareRuleType="{{#if long}}long{{else}}short{{/if}}"
-            {{/if}}
-            xmlns:air="http://www.travelport.com/schema/air_v52_0"
-            xmlns:com="http://www.travelport.com/schema/common_v52_0">
-            <com:BillingPointOfSaleInfo OriginApplication="UAPI" xmlns:com="http://www.travelport.com/schema/common_v52_0"/>
+        <air:AirPriceReq AuthorizedBy="user" TargetBranch="{{TargetBranch}}" TraceId="{{requestId}}" {{#if fetchFareRules}} FareRuleType="{{#if long}}long{{else}}short{{/if}}" {{/if}} xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
+            <com:BillingPointOfSaleInfo OriginApplication="UAPI"/>
             <air:AirItinerary>
                 {{#segments}}
-                <air:AirSegment ArrivalTime="{{arrival}}"
-                                DepartureTime="{{departure}}"
-                                Carrier="{{airline}}"
-                                {{#if bookingClass}} ClassOfService="{{bookingClass}}" {{/if}}
-                                CabinClass="{{serviceClass}}"
-                                Origin="{{from}}"
-                                Destination="{{to}}"
-                                ETicketability="Yes"
-                                Equipment="{{plane}}"
-                                FlightNumber="{{flightNumber}}"
-                                LinkAvailability="true"
-                                PolledAvailabilityOption="Polled avail exists"
-                                ProviderCode="{{../provider}}"
-                                Key="{{@index}}"
-                                {{#if hostToken}}
-                                HostTokenRef="HT_{{@index}}"
-                                {{/if}}
-                                Group="{{group}}">
+                <air:AirSegment ArrivalTime="{{arrival}}" DepartureTime="{{departure}}" Carrier="{{airline}}" {{#if bookingClass}} ClassOfService="{{bookingClass}}" {{/if}} CabinClass="{{serviceClass}}" Origin="{{from}}" Destination="{{to}}" ETicketability="Yes" Equipment="{{plane}}" FlightNumber="{{flightNumber}}" LinkAvailability="true" PolledAvailabilityOption="Polled avail exists" ProviderCode="{{../provider}}" Key="{{@index}}" {{#if hostToken}} HostTokenRef="HT_{{@index}}" {{/if}} Group="{{group}}">
                     {{#if transfer}}
                     <air:Connection/>
                     {{/if}}
@@ -51,21 +27,21 @@ module.exports = `
             {{#if business}}
             <air:AirPricingModifiers>
                 <air:PermittedCabins>
-                    <com:CabinClass Type="Business" xmlns:com="http://www.travelport.com/schema/common_v52_0" />
+                    <com:CabinClass Type="Business"/>
                 </air:PermittedCabins>
             </air:AirPricingModifiers>
             {{else}}
             <air:AirPricingModifiers/>
             {{/if}}
             {{#passengers}}
-            <com:SearchPassenger Key="P_{{@index}}" Code="{{ageCategory}}" {{#if child}}Age="9"{{else if Age}}Age="{{Age}}"{{/if}} xmlns:com="http://www.travelport.com/schema/common_v52_0"/>
+            <com:SearchPassenger Key="P_{{@index}}" Code="{{ageCategory}}" {{#if child}}Age="9"{{else if Age}}Age="{{Age}}"{{/if}}/>
             {{/passengers}}
             <air:AirPricingCommand>
                 {{#segments}}
                 <air:AirSegmentPricingModifiers AirSegmentRef="{{@index}}"{{#if fareBasisCode}} FareBasisCode="{{fareBasisCode}}"{{/if}}>
                 {{#if bookingClass}}
                     <air:PermittedBookingCodes>
-                            <air:BookingCode Code="{{bookingClass}}" />
+                        <air:BookingCode Code="{{bookingClass}}" />
                     </air:PermittedBookingCodes>
                 {{/if}}
                 </air:AirSegmentPricingModifiers>

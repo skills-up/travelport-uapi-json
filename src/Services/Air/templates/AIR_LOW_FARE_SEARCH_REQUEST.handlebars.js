@@ -5,22 +5,9 @@ module.exports = `
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
         {{#if async}}
-        <air:LowFareSearchAsynchReq
-            AuthorizedBy="user" TraceId="{{requestId}}" TargetBranch="{{TargetBranch}}"
-            ReturnUpsellFare="true"
-            xmlns:air="http://www.travelport.com/schema/air_v52_0"
-            xmlns:com="http://www.travelport.com/schema/common_v52_0"
-            >
+        <air:LowFareSearchAsynchReq AuthorizedBy="user" TraceId="{{requestId}}" TargetBranch="{{TargetBranch}}" ReturnUpsellFare="true" xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
         {{else}}
-        <air:LowFareSearchReq
-            AuthorizedBy="user" TraceId="{{requestId}}" TargetBranch="{{TargetBranch}}"
-            ReturnUpsellFare="true"
-            {{#if solutionResult}}
-            SolutionResult="true"
-            {{/if}}
-            xmlns:air="http://www.travelport.com/schema/air_v52_0"
-            xmlns:com="http://www.travelport.com/schema/common_v52_0"
-            >
+        <air:LowFareSearchReq AuthorizedBy="user" TraceId="{{requestId}}" TargetBranch="{{TargetBranch}}" ReturnUpsellFare="true" {{#if solutionResult}} SolutionResult="true" {{/if}} xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
         {{/if}}
             <com:BillingPointOfSaleInfo OriginApplication="uAPI"/>
             {{#legs}}
@@ -84,13 +71,13 @@ module.exports = `
                 {{/if}}
             >
                 <air:PreferredProviders>
-                    <com:Provider Code="{{provider}}" xmlns:com="http://www.travelport.com/schema/common_v52_0"/>
+                    <com:Provider Code="{{provider}}"/>
                 </air:PreferredProviders>
 
                 {{#if permittedCarriers}}
                 <air:PermittedCarriers>
                     {{#each permittedCarriers as |carrier|}}
-                    <com:Carrier Code="{{carrier}}" xmlns:com="http://www.travelport.com/schema/common_v52_0"/>
+                    <com:Carrier Code="{{carrier}}"/>
                     {{/each}}
                 </air:PermittedCarriers>
                 {{/if}}
@@ -98,13 +85,13 @@ module.exports = `
                 {{#if preferredCarriers}}
                 <air:PreferredCarriers>
                     {{#each preferredCarriers as |carrier|}}
-                    <com:Carrier Code="{{carrier}}" xmlns:com="http://www.travelport.com/schema/common_v52_0"/>
+                    <com:Carrier Code="{{carrier}}"/>
                     {{/each}}
                 </air:PreferredCarriers>
                 {{/if}}
             </air:AirSearchModifiers>
             {{#passengers}}
-            <com:SearchPassenger Code="{{ageCategory}}"{{#if child}} Age="9"{{/if}} xmlns:com="http://www.travelport.com/schema/common_v52_0"/>
+            <com:SearchPassenger Code="{{ageCategory}}"{{#if child}} Age="9"{{/if}}/>
             {{/passengers}}
             {{#if pricing}}
             <air:AirPricingModifiers

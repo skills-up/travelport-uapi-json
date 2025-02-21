@@ -218,7 +218,7 @@ function formatPassengerCategories(pricingInfo) {
         // equivalentBasePrice: passengerCategories[ptc].EquivalentBasePrice,
         taxes: passengerCategories[ptc].ApproximateTaxes ?? passengerCategories[ptc].Taxes,
         fees: passengerCategories[ptc].ApproximateFees ?? passengerCategories[ptc].Fees,
-        fareCalc: passengerCategories[ptc].FareCalc,
+        // fareCalc: passengerCategories[ptc].FareCalc,
       },
     }), {});
 
@@ -381,6 +381,7 @@ function formatLowFaresSearch(searchRequest, searchResult) {
                 bookingClass: segmentInfo.BookingCode,
                 baggage: [getBaggage(fareInfo['air:BaggageAllowance'])],
                 fareBasisCode: fareInfo.FareBasis,
+                fareFamily: fareInfo.FareFamily,
                 hostToken: hostTokens[segmentInfo.HostTokenRef]?._,
                 apisRequirements: apisRequirementsList[segment.APISRequirementsRef],
               },
@@ -403,19 +404,19 @@ function formatLowFaresSearch(searchRequest, searchResult) {
     const { passengerCounts, passengerFares } = this.formatPassengerCategories(price['air:AirPricingInfo']);
 
     const result = {
-      totalPrice: price.ApproxiamteTotalPrice ?? price.TotalPrice,
-      basePrice: price.ApproxiamteBasePrice ?? price.BasePrice,
-      taxes: price.ApproxiamteTaxes ?? price.Taxes,
-      fees: price.ApproxiamteFees ?? price.Fees,
+      totalPrice: price.ApproximateTotalPrice ?? price.TotalPrice,
+      basePrice: price.ApproximateBasePrice ?? price.BasePrice,
+      taxes: price.ApproximateTaxes ?? price.Taxes,
+      fees: price.ApproximateFees ?? price.Fees,
       platingCarrier: thisFare.PlatingCarrier,
       directions,
       bookingComponents: [
         {
-          totalPrice: price.ApproxiamteTotalPrice ?? price.TotalPrice,
-          basePrice: price.ApproxiamteBasePrice ?? price.BasePrice,
-          taxes: price.ApproxiamteTaxes ?? price.Taxes,
-          fees: price.ApproxiamteFees ?? price.Fees,
-          uapi_fare_reference: fareKey, // TODO
+          totalPrice: price.ApproximateTotalPrice ?? price.TotalPrice,
+          basePrice: price.ApproximateBasePrice ?? price.BasePrice,
+          taxes: price.ApproximateTaxes ?? price.Taxes,
+          fees: price.ApproximateFees ?? price.Fees,
+          // uapi_fare_reference: fareKey, // TODO
         },
       ],
       passengerFares,
