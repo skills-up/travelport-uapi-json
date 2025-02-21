@@ -66,6 +66,17 @@ module.exports = function (settings) {
       debug,
       options
     ),
+    seatMap: uApiRequest(
+      config.AirService.url,
+      auth,
+      templates.seatMap,
+      'air:SeatMapRsp',
+      AirValidator.SEAT_MAP_REQUEST,
+      AirParser.AIR_ERRORS,
+      AirParser.SEAT_MAP_REQUEST,
+      debug,
+      options
+    ),
     lookupFareRules: uApiRequest(
       config.AirService.url,
       auth,

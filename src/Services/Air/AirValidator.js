@@ -51,6 +51,17 @@ module.exports = {
     )
   ),
 
+  SEAT_MAP_REQUEST: compose(
+    validate(
+      validators.segments,
+      validators.passengerDetails
+    ),
+    transform(
+      transformers.setGroupsForSegments,
+      transformers.setHasFareBasisFlag
+    )
+  ),
+
   AIR_PRICE: compose(
     validate(
       validators.segments,

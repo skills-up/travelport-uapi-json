@@ -1,5 +1,6 @@
 const legs = require('./legs');
 const passengers = require('./passengers');
+const passengerDetails = require('./passenger-details');
 const pricingSolutionXml = require('./pricing-solution-xml');
 const paramsIsObject = require('./params-is-object');
 const fop = require('./fop');
@@ -27,6 +28,7 @@ const carriers = require('./carriers');
 module.exports = {
   legs,
   passengers,
+  passengerDetails,
   pricingSolutionXml,
   paramsIsObject,
   allowDirectAccess,

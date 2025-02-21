@@ -31,6 +31,10 @@ module.exports = (settings) => {
       return service.airPrice(options);
     },
 
+    seatMap(options) {
+      return service.seatMap(options);
+    },
+
     fareRules(options) {
       // add request for fare rules
       const request = {

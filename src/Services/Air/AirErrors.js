@@ -16,6 +16,8 @@ Object.assign(AirValidationError, createErrorsList({
   ParamsInvalidType: 'Params should be passed as object',
   PassengersHashMissing: 'Passengers hash of passenger types is missing',
   PassengersCategoryInvalid: 'Passengers hash contains invalid passenger',
+  PassengersAgeInvalid: 'Passengers age is not a valid number',
+  PassengersNameInvalid: 'Passengers name is not valid',
   PassengersCountInvalid: 'Passengers category has wrong passegners number',
   LegsMissing: 'Missing legs in request',
   LegsInvalidType: 'Invalid type for legs in request',

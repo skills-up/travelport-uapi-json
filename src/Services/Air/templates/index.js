@@ -6,6 +6,7 @@ const flightInformation = require('./AIR_FLIGHT_INFORMATION_REQUEST.handlebars')
 const lowFareSearch = require('./AIR_LOW_FARE_SEARCH_REQUEST.handlebars');
 const retrieveLowFareSearch = require('./AIR_RETRIEVE_LOW_FARE_SEARCH_REQUEST.handlebars');
 const price = require('./AIR_PRICE_REQ.handlebars');
+const seatMap = require('./SEAT_MAP_REQ.handlebars');
 const ticket = require('./AIR_TICKET_REQUEST.handlebars');
 const cancel = require('./AirCancel.handlebars');
 const retrieveDocument = require('./AirRetrieveDocument.handlebars');
@@ -28,6 +29,7 @@ module.exports = {
   lowFareSearch,
   retrieveLowFareSearch,
   price,
+  seatMap,
   ticket,
   cancel,
   retrieveDocument,

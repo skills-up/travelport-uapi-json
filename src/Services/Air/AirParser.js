@@ -376,7 +376,63 @@ function airPrice(obj) {
 }
 
 function seatMap(obj) {
-  return obj;
+  let {
+    'common_v52_0:ResponseMessage': messages,
+    'common_v52_0:HostToken': hostTokens,
+    'air:AirSegment': segments,
+    'air:SearchTraveler': travellers,
+    'air:OptionalServices': optionalServices,
+    'air:Rows': rows
+  } = obj;
+
+  messages = messages.map(({Type, _}) => ({Type, Message:_}));
+
+  segments = Object.values(segments).map(segment => {
+    segment.HostToken = hostTokens[segment.HostTokenRef]?._;
+    return segment;
+  });
+
+  travellers = Object.values(travellers).map(traveller => ({
+    Key: traveller.Key,
+    Code: traveller.Code,
+    Age: traveller.Age,
+    Name: traveller['common_v52_0:Name'], 
+  }));
+
+  rows = rows.map(row => {
+    const {Number, 'air:Characteristic': RowCharacteristic, 'air:Facility': facilities} = row;
+    const Seats = format.toArray(facilities).map(facility => {
+      const {'air:Characteristic': SeatCharacteristics, 'common_v52_0:Remark': Description, Type, SeatCode, Availability, Paid, OptionalServiceRef} = facility;
+      const optionalService = optionalServices[OptionalServiceRef];
+      return {
+        SeatCode,
+        Type,
+        Description,
+        Availability,
+        Paid,
+        SeatCharacteristics: format.toArray(SeatCharacteristics),
+        Price: optionalService?.ApproximateTotalPrice || optionalService?.TotalPrice,
+      };
+    });
+
+    return {
+      Number,
+      RowCharacteristic,
+      Seats,
+    };
+  });
+
+  const seatMap = {};
+  rows.forEach(row => {
+    seatMap[row.Number] = row;
+  }) 
+  
+  return {
+    messages,
+    segments,
+    travellers,
+    seatMap,
+  };
 }
 
 function airPriceRspPricingSolutionXML(obj) {
@@ -761,9 +817,9 @@ function getTicketFromEtr(etr, obj, allowNoProviderLocatorCodeRetrieval = false)
       : null),
     ...(priceInfoAvailable
       ? {
-        totalPrice: priceSource.ApproxiamteTotalPrice || priceSource.TotalPrice 
-        || `${(/* priceSource.EquivalentBasePrice || */ priceSource.ApproxiamteBasePrice || priceSource.BasePrice).slice(0, 3)}0`,
-        basePrice: priceSource.ApproxiamteBasePrice ?? priceSource.BasePrice,
+        totalPrice: priceSource.ApproximateTotalPrice || priceSource.TotalPrice 
+        || `${(/* priceSource.EquivalentBasePrice || */ priceSource.ApproximateBasePrice || priceSource.BasePrice).slice(0, 3)}0`,
+        basePrice: priceSource.ApproximateBasePrice ?? priceSource.BasePrice,
         // equivalentBasePrice: priceSource.EquivalentBasePrice,
       }
       : null),
