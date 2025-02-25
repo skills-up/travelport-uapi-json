@@ -22,10 +22,8 @@ module.exports = `
             {{#passengers}}
             {{#equal ageCategory "INF"}}
             {{else}}
-            <air:SearchTraveler Key="P_{{@index}}" Code="{{ageCategory}}" {{#if child}}Age="9"{{else if age}}Age="{{age}}"{{/if}}>
-            {{#with name}}
-            <com:Name Prefix="{{Prefix}}" First="{{First}}" Last="{{Last}}" {{#if Middle}}Middle="{{Middle}}"{{/if}} {{#if DOB}}DOB="{{DOB}}"{{/if}}/>
-            {{/with}}
+            <air:SearchTraveler Key="P_{{@index}}" Code="{{ageCategory}}" {{#if age}}Age="{{age}}"{{else if child}}Age="9"{{/if}} {{#if birthDate}}DOB="{{birthDate}}"{{/if}} {{#if gender}}Gender="{{gender}}"{{/if}} {{if nationality}}Nationality="{{nationality}}"{{/if}}>
+                <com:Name Prefix="{{title}}" First="{{firstName}}" Last="{{lastName}}"/>
             </air:SearchTraveler>
             {{/equal}}
             {{/passengers}}
