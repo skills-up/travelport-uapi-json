@@ -20,7 +20,7 @@ const ticketRetrieveErrorPattern = /HOST ERROR DURING TICKET RETRIEVE/i;
 const accessedByAnotherTransactionPattern = /ACCESSED BY ANOTHER TRANSACTION/i;
 const noValidFare = /NO VALID FARE FOR INPUT CRITERIA/;
 const bookingStaleData = /failed refresh|data may be stale/i;
-
+const noFlightsFoundErrorPattern = /NO MATCHES FOUND/i;
 const BOOKING_STALE_DATA_ERROR_CODE = 1301;
 
 const parseFareCalculation = (str) => {
@@ -579,6 +579,8 @@ function processUAPIError(source) {
       throw new AirRuntimeError.UnableToRetrieveTicket(sourceWithFaultString);
     case accessedByAnotherTransactionPattern.test(uapiErrorMessage):
       throw new AirRuntimeError.AccessedByAnotherTransaction(sourceWithFaultString);
+    case noFlightsFoundErrorPattern.test(uapiErrorMessage):
+      throw new AirRuntimeError.NoResultsFound(sourceWithFaultString);
     default:
       throw new RequestRuntimeError.UAPIServiceError(sourceWithFaultString);
   }
