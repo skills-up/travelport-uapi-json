@@ -6,9 +6,9 @@ module.exports = `
     <soap:Header/>
     <soap:Body>
         <air:SeatMapReq AuthorizedBy="user" TargetBranch="{{TargetBranch}}" TraceId="{{requestId}}" ReturnSeatPricing="true" ReturnBrandingInfo="true" xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
-            <com:BillingPointOfSaleInfo OriginApplication="UAPI"/>
+            <com:BillingPointOfSaleInfo OriginApplication="uAPI"/>
             {{#segments}}
-            <air:AirSegment ArrivalTime="{{arrival}}" DepartureTime="{{departure}}" Carrier="{{airline}}"{{#if bookingClass}} ClassOfService="{{bookingClass}}"{{/if}} CabinClass="{{serviceClass}}" Origin="{{from}}" Destination="{{to}}" FlightNumber="{{flightNumber}}" ProviderCode="{{../provider}}" Key="{{@index}}"{{#if hostToken}} HostTokenRef="HT_{{@index}}"{{/if}} Group="{{group}}">
+            <air:AirSegment Key="{{@index}}" Group="{{group}}" Carrier="{{airline}}" FlightNumber="{{flightNumber}}" ProviderCode="{{../provider}}" Origin="{{from}}" Destination="{{to}}" DepartureTime="{{departure}}" ArrivalTime="{{arrival}}"{{#if bookingClass}} ClassOfService="{{bookingClass}}"{{/if}}{{#if hostToken}} HostTokenRef="HT_{{@index}}"{{/if}}>
                 {{#if transfer}}
                 <air:Connection/>
                 {{/if}}
@@ -22,7 +22,7 @@ module.exports = `
             {{#passengers}}
             {{#equal ageCategory "INF"}}
             {{else}}
-            <air:SearchTraveler Key="P_{{@index}}" Code="{{ageCategory}}"{{#if age}} Age="{{age}}"{{else}}{{#equal ageCategory "CHD"}} Age="9"{{/equal}}{{/if}}{{#if gender}} Gender="{{gender}}"{{/if}}{{#if nationality}} Nationality="{{nationality}}"{{/if}}>
+            <air:SearchTraveler Key="P_{{@index}}" Code="{{ageCategory}}">
                 <com:Name Prefix="{{title}}" First="{{firstName}}" Last="{{lastName}}"/>
             </air:SearchTraveler>
             {{/equal}}

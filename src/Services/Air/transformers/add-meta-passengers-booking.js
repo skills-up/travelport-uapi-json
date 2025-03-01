@@ -26,14 +26,16 @@ module.exports = (params) => {
 
     item.ssr = item.ssr || [];
 
-    item.ssr.push({
-      type: 'FOID',
-      text: `PP${country}${num}`,
-    });
-    item.ssr.push({
-      type: 'DOCS',
-      text: `P/${country}/${num}/${country}/${birth}/${gender}/${due}/${last}/${first}`,
-    });
+    if (country && num) {
+      item.ssr.push({
+        type: 'FOID',
+        text: `PP${country}${num}`,
+      });
+      item.ssr.push({
+        type: 'DOCS',
+        text: `P/${country}/${num}/${country}/${birth}/${gender}/${due}/${last}/${first}`,
+      });
+    }
 
     item.DOB = birthSSR.format('YYYY-MM-DD');
   });

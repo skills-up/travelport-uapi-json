@@ -47,6 +47,40 @@ module.exports = `
                 </air:AirSegmentPricingModifiers>
                 {{/segments}}
             </air:AirPricingCommand>
+            <air:OptionalServices>
+            {{#optionalServices}}
+                <air:OptionalService Key="O_{{@index}}" Type="{{Type}}" TotalPrice="{{TotalPrice}}" SupplierCode="{{SupplierCode}}" ServiceStatus="Offered" Source="{{Source}}" Quantity="{{Quantity}}" ProviderDefinedType="{{ProviderDefinedType}}" BasePrice="{{BasePrice}}" ApproximateTotalPrice="{{ApproximateTotalPrice}}" IsRepriceRequired="false" PurchaseWindow="BookingOnly">
+                {{#refs}}
+                    <com:ServiceData AirSegmentRef="{{segment}}" BookingTravelerRef="P_{{passenger}}" {{#if data}}Data="{{data}}"{{/if}}/>
+                {{/refs}}
+                </air:OptionalService>
+            {{/optionalServices}}
+            </air:OptionalServices>
+        {{#with payment}}
+            {{#equal type "AgencyPayment"}}
+            <com:FormOfPayment Type="AgencyPayment">
+                <com:AgencyPayment AgencyBillingIdentifier="{{agency.identifier}}" AgencyBillingPassword="{{agency.password}}"/>
+            </com:FormOfPayment>
+            {{/equal}}
+            {{#equal type "CreditCard"}}
+            <com:FormOfPayment Type="Credit">
+                {{#with creditCard}}
+                <com:CreditCard BankCountryCode="{{country}}" BankName="{{bank}}" CVV="{{cvv}}" ExpDate="{{expiry}}" Name="{{name}}" Number="{{number}}" Type="{{issuer}}">
+                {{/with}}
+                    {{#with billngAddress}}
+                    <com:BillingAddress>
+                        <com:AddressName>{{name}}</com:AddressName>
+                        <com:Street>{{street}}</com:Street>
+                        <com:City>{{city}}</com:City>
+                        <com:State>{{state}}</com:State>
+                        <com:PostalCode>{{pin}}</com:PostalCode>
+                        <com:Country>{{country}}</com:Country>
+                    </com:BillingAddress>
+                    {{/with}}
+                </com:CreditCard>
+            </com:FormOfPayment>
+            {{/equal}}
+        {{/with}}
             {{#if emulatePcc}}
             <air:PCC>
                 <com:OverridePCC ProviderCode="{{provider}}" PseudoCityCode="{{emulatePcc}}"/>

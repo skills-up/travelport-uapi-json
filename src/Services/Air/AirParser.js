@@ -234,27 +234,50 @@ function airPrice(obj) {
     throw new AirParsingError.PlatingCarrierNotSet();
   }
 
+  const airSegments = obj['air:AirItinerary']['air:AirSegment'];
+  const segments = Object.keys(airSegments).map((segKey) => {
+    return obj['air:AirItinerary']['air:AirSegment'][segKey];
+  });
+
   const optionalServices = {};
   Object.values(pricingSolution['air:OptionalServices'] ?? {}).filter(service => service.Type !== 'PreReservedSeatAssignment').forEach(service => {
     const segRef = service['common_v52_0:ServiceData']['AirSegmentRef'];
     if (optionalServices[segRef] === undefined) {
       optionalServices[segRef] = {};
     }
-    optionalServices[segRef][service.ProviderDefinedType] = {
-      Type: service.Type,
-      TotalPrice: service.ApproximateTotalPrice ?? service.TotalPrice,
-      ServiceStatus: service.ServiceStatus,
-      Key: service.Key,
-      DisplayText: service.DisplayText,
-      Quantity: service.Quantity,
-    };
+    if (optionalServices[segRef][service.ProviderDefinedType] === undefined) {
+      optionalServices[segRef][service.ProviderDefinedType] = (({
+        Type,
+        ProviderDefinedType,
+        DisplayText,
+        Source,
+        SupplierCode,
+        ServiceStatus,
+        Quantity,
+        BasePrice,
+        TotalPrice,
+        ApproximateBasePrice,
+        ApproximateTotalPrice,
+        Taxes,
+        CreateDate,
+      }) => ({
+        Type,
+        ProviderDefinedType,
+        DisplayText,
+        Source,
+        SupplierCode,
+        ServiceStatus,
+        Quantity,
+        BasePrice,
+        TotalPrice,
+        ApproximateBasePrice,
+        ApproximateTotalPrice,
+        Taxes,
+        CreateDate,
+      }))(service);
+    }
   });
   
-  const airSegments = obj['air:AirItinerary']['air:AirSegment'];
-  const segments = Object.keys(airSegments).map((segKey) => {
-    return obj['air:AirItinerary']['air:AirSegment'][segKey];
-  });
-
   const groups = segments.reduce((previousValue, currentValue) => {
     if (previousValue.indexOf(currentValue.Group) === -1) {
       previousValue.push(currentValue.Group);
@@ -411,7 +434,9 @@ function seatMap(obj) {
         Availability,
         Paid,
         SeatCharacteristics: format.toArray(SeatCharacteristics),
-        Price: optionalService?.ApproximateTotalPrice || optionalService?.TotalPrice,
+        BasePrice: optionalService?.BasePrice,
+        TotalPrice: optionalService?.TotalPrice,
+        ApproximateTotalPrice: optionalService?.ApproximateTotalPrice,
       };
     });
 
