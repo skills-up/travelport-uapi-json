@@ -517,7 +517,7 @@ function airPriceRspPricingSolutionXML(obj) {
   pricingSolution['air:AirPricingInfo'] = pricingInfos;
   const resultXml = {};
 
-  ['air:AirSegment', 'air:AirPricingInfo', 'air:FareNote', `common_${this.uapi_version}:HostToken`].forEach((root) => {
+  ['air:AirSegment', 'air:AirPricingInfo', 'air:FareNote', `common_${this.uapi_version}:HostToken`, 'air:OptionalServices'].forEach((root) => {
     if (!pricingSolution[root]) {
       return;
     }
@@ -538,7 +538,8 @@ function airPriceRspPricingSolutionXML(obj) {
     lines.splice(-1, 1);
 
     // return
-    resultXml[root + '_XML'] = lines.join('\n');
+    let counter = 0;
+    resultXml[root + '_XML'] = lines.join('\n').replace(/OptionalServicesRuleRef="[^"]+/g, (match) => `${match}${counter++}`);
   });
 
   const mergedSegments = this.mergeLeafRecursive(objCopy, 'air:AirPriceRsp')['air:AirPriceRsp']['air:AirItinerary']['air:AirSegment'];
