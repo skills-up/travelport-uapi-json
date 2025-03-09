@@ -422,41 +422,47 @@ function seatMap(obj) {
     Name: traveller['common_v52_0:Name'], 
   }));
 
-  rows = rows.map(row => {
-    const {Number, 'air:Characteristic': RowCharacteristic, 'air:Facility': facilities} = row;
-    const Seats = format.toArray(facilities).map(facility => {
-      const {'air:Characteristic': SeatCharacteristics, 'common_v52_0:Remark': Description, Type, SeatCode, Availability, Paid, OptionalServiceRef} = facility;
-      const optionalService = optionalServices[OptionalServiceRef];
+  if (! rows?.[0]?.SegmentRef) {
+    rows = [{
+      'air:Row': rows,
+      SegmentRef: segments[0].Key
+    }];
+  }
+
+  const seatMaps = rows.reduce((map, row) => {
+    map[row.SegmentRef] = row['air:Row'].map(row => {
+      const {Number, 'air:Characteristic': RowCharacteristic, 'air:Facility': facilities} = row;
+      const Seats = format.toArray(facilities).map(facility => {
+        const {'air:Characteristic': SeatCharacteristics, 'common_v52_0:Remark': Description, Type, SeatCode, Availability, Paid, OptionalServiceRef} = facility;
+        const optionalService = optionalServices[OptionalServiceRef];
+        return {
+          SeatCode,
+          Type,
+          Description,
+          Availability,
+          Paid,
+          SeatCharacteristics: format.toArray(SeatCharacteristics),
+          ProviderDefinedType: optionalService?.ProviderDefinedType,
+          BasePrice: optionalService?.BasePrice,
+          TotalPrice: optionalService?.TotalPrice,
+          ApproximateTotalPrice: optionalService?.ApproximateTotalPrice,
+        };
+      });
+  
       return {
-        SeatCode,
-        Type,
-        Description,
-        Availability,
-        Paid,
-        SeatCharacteristics: format.toArray(SeatCharacteristics),
-        BasePrice: optionalService?.BasePrice,
-        TotalPrice: optionalService?.TotalPrice,
-        ApproximateTotalPrice: optionalService?.ApproximateTotalPrice,
+        Number,
+        RowCharacteristic,
+        Seats,
       };
     });
-
-    return {
-      Number,
-      RowCharacteristic,
-      Seats,
-    };
-  });
-
-  const seatMap = {};
-  rows.forEach(row => {
-    seatMap[row.Number] = row;
-  }) 
+    return map;
+  }, {});
   
   return {
     messages,
     segments,
     travellers,
-    seatMap,
+    seatMaps,
   };
 }
 
