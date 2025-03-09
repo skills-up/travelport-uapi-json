@@ -460,6 +460,30 @@ function seatMap(obj) {
   };
 }
 
+function buildXML(obj, root) {
+  if (!obj[root]) {
+    return;
+  }
+  const builder = new xml2js.Builder({
+    headless: true,
+    rootName: root,
+  });
+
+  // workaround because xml2js does not accept arrays to generate multiple "root objects"
+  const buildObject = {
+    [root]: obj[root],
+  };
+
+  const intResult = builder.buildObject(buildObject);
+  // remove root object tags at first and last line
+  const lines = intResult.split('\n');
+  lines.splice(0, 1);
+  lines.splice(-1, 1);
+
+  // return
+  return lines.join('\n');
+}
+
 function airPriceRspPricingSolutionXML(obj) {
   // first let's parse a regular structure
   const objCopy = JSON.parse(JSON.stringify((obj)));
@@ -485,11 +509,19 @@ function airPriceRspPricingSolutionXML(obj) {
   pricingSolution['air:AirSegment'] = segments;
 
   // pricingSolution = moveObjectElement('air:AirSegment', '$', pricingSolution);
+  const optionalServicesTotalXML = buildXML(pricingSolution['air:OptionalServices'][0], 'air:OptionalServicesTotal');
+  const optionalServices = pricingSolution['air:OptionalServices'][0]['air:OptionalService'].filter(
+    (service) => service.$.ServiceStatus === 'Priced'
+  );
+  const optionalServicesXML = optionalServices.length ? buildXML({root: {'air:OptionalService': optionalServices}}, 'root') : '';
 
   // delete existing air passenger types for each fare (map stored in passengersPerReservations)
   const pricingInfos = pricingSolution['air:AirPricingInfo'].map(
     (info) => ({ ...info, 'air:PassengerType': [] })
   );
+
+  const passengerCodes = pricingSolution['air:AirPricingInfo'].map((info) => info['air:PassengerType']).flat();
+  const passengerKeys = {};
 
   this.env.passengers.forEach((passenger, index) => {
     // find a reservation with places available for this passenger type, decrease counter
@@ -512,13 +544,23 @@ function airPriceRspPricingSolutionXML(obj) {
         Age: passenger.Age,
       },
     });
+
+    for (let i = 0; i < passengerCodes.length; i++) {
+      const passengerCode = passengerCodes[i].$;
+      if (passengerCode.Key || passengerCode.Code !== passenger.ageCategory || (passengerCode.Age && parseInt(passengerCode.Age) !== parseInt(passenger.Age))) {
+        continue;
+      }
+      passengerCode.Key = `P_${index}`;
+      passengerKeys[passengerCode.Key] = passengerCode.BookingTravelerRef;
+      break;
+    }
   });
 
   pricingSolution['air:AirPricingInfo'] = pricingInfos;
   const resultXml = {};
 
   ['air:AirSegment', 'air:AirPricingInfo', 'air:FareNote', `common_${this.uapi_version}:HostToken`, 'air:OptionalServices'].forEach((root) => {
-    if (!pricingSolution[root]) {
+    /* if (!pricingSolution[root]) {
       return;
     }
     const builder = new xml2js.Builder({
@@ -539,8 +581,19 @@ function airPriceRspPricingSolutionXML(obj) {
 
     // return
     let counter = 0;
-    resultXml[root + '_XML'] = lines.join('\n').replace(/OptionalServicesRuleRef="[^"]+/g, (match) => `${match}${counter++}`);
+    let xml = lines.join('\n').replace(/OptionalServicesRuleRef="[^"]+/g, (match) => `${match}${counter++}`);
+    passengerTypes.forEach((passengerType) => {
+      xml = xml.replaceAll(passengerType.BookingTravelerRef, passengerType.Key);
+    }); */
+    let counter = 0;
+    resultXml[root + '_XML'] = buildXML(pricingSolution, root)?.replace(/OptionalServicesRuleRef="[^"]+/g, (match) => `${match}${counter++}`);
   });
+  let xml = resultXml['air:AirPricingInfo_XML'];
+  Object.keys(passengerKeys).forEach((key) => {
+    const pk = passengerKeys[key];
+    xml = xml.replaceAll(`BookingTravelerRef="${key}"`, `BookingTravelerRef="${pk}"`);
+  });
+  resultXml['air:AirPricingInfo_XML'] = xml;
 
   const mergedSegments = this.mergeLeafRecursive(objCopy, 'air:AirPriceRsp')['air:AirPriceRsp']['air:AirItinerary']['air:AirSegment'];
 
@@ -548,6 +601,9 @@ function airPriceRspPricingSolutionXML(obj) {
     'air:AirPricingSolution': utils.clone(pricingSolution.$),
     'air:AirPricingSolution_XML': resultXml,
     'air:AirSegment': mergedSegments,
+    passengerKeys,
+    'air:OptionalServicesTotal_XML': optionalServicesTotalXML,
+    'air:OptionalServices_XML': optionalServicesXML,
   };
 }
 

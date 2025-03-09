@@ -7,6 +7,8 @@ const addMetaPassengersBooking = require('./add-meta-passengers-booking');
 const setSegmentRefForSSR = require('./set-segment-ref-for-ssr');
 const decodeExchangeToken = require('./decode-exchange-token');
 const fixCardFop = require('./fix-card-fop');
+const setSegmentRefForOptionalServices = require('./set-segment-ref-for-optional-services');
+const setPassengersKey = require('./set-passengers-key');
 
 module.exports = {
   convertPassengersObjectToArray,
@@ -18,4 +20,6 @@ module.exports = {
   setSegmentRefForSSR,
   decodeExchangeToken,
   fixCardFop,
+  setSegmentRefForOptionalServices,
+  setPassengersKey,
 };

@@ -22,7 +22,7 @@ module.exports = `
             <com:OverridePCC ProviderCode="{{provider}}" PseudoCityCode="{{emulatePcc}}"/>
             {{/if}}
             {{#each passengers}}
-            <com:BookingTraveler Key="P_{{@index}}" Age="{{Age}}" DOB="{{birthDate}}" Gender="{{gender}}" TravelerType="{{ageCategory}}">
+            <com:BookingTraveler Key="{{{Key}}}" Age="{{Age}}" DOB="{{birthDate}}" Gender="{{gender}}" TravelerType="{{ageCategory}}">
                 <com:BookingTravelerName First="{{firstName}}" Last="{{lastName}}" {{#if title}}Prefix="{{title}}"{{/if}}/>
                 {{#if ../deliveryInformation}}
                 <com:DeliveryInfo>
@@ -100,7 +100,12 @@ module.exports = `
                 {{{air:AirPricingSolution_XML.air:AirPricingInfo_XML}}}
                 {{{air:AirPricingSolution_XML.air:FareNote_XML}}}
                 {{{air:AirPricingSolution_XML.common_v52_0:HostToken_XML}}}
-                {{{air:AirPricingSolution_XML.air:OptionalServices_XML}}}
+                {{#if optionalServices}}
+                <air:OptionalServices>
+                    {{{air:OptionalServicesTotal_XML}}}
+                    {{{air:OptionalServices_XML}}}
+                </air:OptionalServices>
+                {{/if}}
             </air:AirPricingSolution>
 
             <com:ActionStatus Type="ACTIVE" TicketDate="{{ticketDate}}" ProviderCode="{{provider}}"/>
