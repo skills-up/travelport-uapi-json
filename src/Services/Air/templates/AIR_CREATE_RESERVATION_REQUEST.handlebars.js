@@ -99,6 +99,8 @@ module.exports = `
                 {{{air:AirPricingSolution_XML.air:AirSegment_XML}}}
                 {{{air:AirPricingSolution_XML.air:AirPricingInfo_XML}}}
                 {{{air:AirPricingSolution_XML.air:FareNote_XML}}}
+                {{{air:AirPricingSolution_XML.air:FeeInfo_XML}}}
+                {{{air:AirPricingSolution_XML.air:TaxInfo_XML}}}
                 {{{air:AirPricingSolution_XML.common_v52_0:HostToken_XML}}}
                 {{#if optionalServices}}
                 <air:OptionalServices>

@@ -241,7 +241,7 @@ function airPrice(obj) {
 
   const optionalServices = {};
   Object.values(pricingSolution['air:OptionalServices'] ?? {}).filter(service => service.Type !== 'PreReservedSeatAssignment').forEach(service => {
-    const segRef = service['common_v52_0:ServiceData']['AirSegmentRef'];
+    const segRef = service[`common_${this.uapi_version}:ServiceData`]['AirSegmentRef'];
     if (optionalServices[segRef] === undefined) {
       optionalServices[segRef] = {};
     }
@@ -399,29 +399,22 @@ function airPrice(obj) {
 }
 
 function seatMap(obj) {
-  let {
-    'common_v52_0:ResponseMessage': messages,
-    'common_v52_0:HostToken': hostTokens,
-    'air:AirSegment': segments,
-    'air:SearchTraveler': travellers,
-    'air:OptionalServices': optionalServices,
-    'air:Rows': rows
-  } = obj;
-
-  messages = messages.map(({Type, _}) => ({Type, Message:_}));
-
-  segments = Object.values(segments).map(segment => {
+  const hostTokens = obj[`common_${this.uapi_version}:HostToken`];
+  const messages = obj[`common_${this.uapi_version}:ResponseMessage`].map(({Type, _}) => ({Type, Message:_}));
+  const optionalServices = obj['air:OptionalServices'];
+  const segments = Object.values(obj['air:AirSegment']).map(segment => {
     segment.HostToken = hostTokens[segment.HostTokenRef]?._;
     return segment;
   });
 
-  travellers = Object.values(travellers).map(traveller => ({
+  const travellers = Object.values(obj['air:SearchTraveler']).map(traveller => ({
     Key: traveller.Key,
     Code: traveller.Code,
     Age: traveller.Age,
-    Name: traveller['common_v52_0:Name'], 
+    Name: traveller[`common_${this.uapi_version}:Name`], 
   }));
 
+  let rows = obj['air:Rows'];
   if (! rows?.[0]?.SegmentRef) {
     rows = [{
       'air:Row': rows,
@@ -430,18 +423,18 @@ function seatMap(obj) {
   }
 
   const seatMaps = rows.reduce((map, row) => {
-    map[row.SegmentRef] = row['air:Row'].map(row => {
+    map[row.SegmentRef] = row['air:Row'].reduce((data, row) => {
       const {Number, 'air:Characteristic': RowCharacteristic, 'air:Facility': facilities} = row;
       const Seats = format.toArray(facilities).map(facility => {
-        const {'air:Characteristic': SeatCharacteristics, 'common_v52_0:Remark': Description, Type, SeatCode, Availability, Paid, OptionalServiceRef} = facility;
+        const {Type, SeatCode, Availability, Paid, OptionalServiceRef} = facility;
         const optionalService = optionalServices[OptionalServiceRef];
         return {
           SeatCode,
           Type,
-          Description,
           Availability,
           Paid,
-          SeatCharacteristics: format.toArray(SeatCharacteristics),
+          Description: facility[`common_${this.uapi_version}:Remark`],
+          SeatCharacteristics: format.toArray(facility['air:Characteristic']),
           ProviderDefinedType: optionalService?.ProviderDefinedType,
           BasePrice: optionalService?.BasePrice,
           TotalPrice: optionalService?.TotalPrice,
@@ -449,12 +442,13 @@ function seatMap(obj) {
         };
       });
   
-      return {
+      data[Number] = {
         Number,
         RowCharacteristic,
         Seats,
       };
-    });
+      return data;
+    }, {});
     return map;
   }, {});
   
@@ -565,7 +559,7 @@ function airPriceRspPricingSolutionXML(obj) {
   pricingSolution['air:AirPricingInfo'] = pricingInfos;
   const resultXml = {};
 
-  ['air:AirSegment', 'air:AirPricingInfo', 'air:FareNote', `common_${this.uapi_version}:HostToken`, 'air:OptionalServices'].forEach((root) => {
+  ['air:AirSegment', 'air:AirPricingInfo', 'air:FareNote', 'air:FeeInfo', 'air:TaxInfo', `common_${this.uapi_version}:HostToken`].forEach((root) => {
     /* if (!pricingSolution[root]) {
       return;
     }
