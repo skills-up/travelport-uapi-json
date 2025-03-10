@@ -24,6 +24,9 @@ const noFlightsFoundErrorPattern = /NO MATCHES FOUND/i;
 const BOOKING_STALE_DATA_ERROR_CODE = 1301;
 
 const parseFareCalculation = (str) => {
+  if (!str) {
+    return {};
+  }
   const fareCalculation = str.match(fareCalculationPattern)[1];
   const firstOrigin = str.match(firstOriginPattern);
   const roe = str.match(/ROE((?:\d+\.)?\d+)/);
