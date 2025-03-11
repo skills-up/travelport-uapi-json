@@ -139,6 +139,16 @@ module.exports = {
     transform()
   ),
 
+  AIR_ISSUE_HOLD: compose(
+    validate(
+      validators.pnr,
+      validators.version,
+      validators.universalRecordLocator,
+      validators.reservationLocator,
+    ),
+    transform()
+  ),
+
   AIR_FLIGHT_INFORMATION: compose(
     validate(
       validators.flightInfo

@@ -38,6 +38,37 @@ module.exports = `
             {{/if}}
           </air:AirSegment>
           {{/segments}}
+        {{#with payment}}
+          {{#if amount}}
+          <air:AirPricingPayment>
+            <com:Payment Amount="{{amount}}" FormOfPaymentRef="FOP_1" Type="Passenger"/>
+            {{#equal type "AgencyPayment"}}
+            <com:FormOfPayment Key="FOP_1" Type="AgencyPayment">
+                <com:AgencyPayment AgencyBillingIdentifier="{{agency.identifier}}" AgencyBillingPassword="{{agency.password}}"/>
+            </com:FormOfPayment>
+            {{/equal}}
+            {{#equal type "CreditCard"}}
+            <com:FormOfPayment Key="FOP_1" Type="Credit">
+                {{#with creditCard}}
+                <com:CreditCard BankCountryCode="{{country}}" BankName="{{bank}}" CVV="{{cvv}}" ExpDate="{{expiry}}" Name="{{name}}" Number="{{number}}" Type="{{issuer}}">
+                {{/with}}
+                    {{#with billngAddress}}
+                    <com:BillingAddress>
+                        <com:AddressName>{{name}}</com:AddressName>
+                        <com:Street>{{street}}</com:Street>
+                        <com:City>{{city}}</com:City>
+                        <com:State>{{state}}</com:State>
+                        <com:PostalCode>{{pin}}</com:PostalCode>
+                        <com:Country>{{country}}</com:Country>
+                    </com:BillingAddress>
+                    {{/with}}
+                </com:CreditCard>
+            </com:FormOfPayment>
+            {{/equal}}
+            <air:AirPricingInfoRef Key="APIR_1"/>
+          </air:AirPricingPayment>
+          {{/if}}
+        {{/with}}
         </univ:AirAdd>
       </univ:UniversalModifyCmd>
     </univ:UniversalRecordModifyReq>

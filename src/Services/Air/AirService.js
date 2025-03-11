@@ -187,6 +187,17 @@ module.exports = function (settings) {
       debug,
       options
     ),
+    issueHold: uApiRequest(
+      config.UniversalRecord.url,
+      auth,
+      templates.universalRecordModify,
+      'universal:UniversalRecordModifyRsp',
+      AirValidator.AIR_ISSUE_HOLD,
+      AirParser.AIR_ERRORS,
+      AirParser.UNIVERSAL_RECORD_MODIFY,
+      debug,
+      options
+    ),
     cancelUR: uApiRequest(
       config.UniversalRecord.url,
       auth,

@@ -74,6 +74,31 @@ module.exports = (settings) => {
       return service.addSegments(options);
     },
 
+    issueHold(options) {
+      if (
+        !options.version
+        || !options.universalRecordLocatorCode
+        || !options.reservationLocatorCode
+      ) {
+        return this.getBooking({ pnr: options.pnr })
+          .then((booking) => {
+            const missedOptions = {
+              version: options.version || booking.version,
+              reservationLocatorCode: (
+                options.reservationLocatorCode || booking.uapi_reservation_locator
+              ),
+              universalRecordLocatorCode: (
+                options.universalRecordLocatorCode || booking.uapi_ur_locator
+              ),
+            };
+
+            return service.issueHold({ ...options, ...missedOptions });
+          });
+      }
+
+      return service.issueHold(options);
+    },
+
     book(options) {
       return service.airPricePricingSolutionXML(options).then((data) => {
         const tauDate = moment(options.tau || null);
